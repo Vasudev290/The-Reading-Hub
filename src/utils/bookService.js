@@ -23,28 +23,6 @@ class BookService {
         imageUrl: "/images/to-kill-a-mockingbird.jpeg",
         description:
           "A novel about racial injustice in the Deep South, through the eyes of young Scout Finch.",
-      },
-      {
-        id: 2,
-        title: "1984",
-        author: "George Orwell",
-        category: "Dystopian",
-        price: 249,
-        stock: 4,
-        imageUrl: "https://covers.openlibrary.org/b/id/7222246-L.jpg",
-        description:
-          "A chilling depiction of totalitarian government surveillance and control.",
-      },
-      {
-        id: 3,
-        title: "The Great Gatsby",
-        author: "F. Scott Fitzgerald",
-        category: "Classic",
-        price: 279,
-        stock: 3,
-        imageUrl: "https://covers.openlibrary.org/b/id/7352161-L.jpg",
-        description:
-          "The tragic story of Jay Gatsby and his unrequited love for Daisy Buchanan.",
       }
     ];
     this.books = sampleBooks;
