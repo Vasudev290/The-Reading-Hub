@@ -174,7 +174,7 @@ class BookService {
         category: "Science Fiction",
         price: 249,
         stock: 6,
-        imageUrl: "https://covers.openlibrary.org/b/id/8114151-L.jpg",
+        imageUrl: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400",
         description:
           "In a future where books are banned, a fireman’s job is to burn them — until he questions everything.",
       },
