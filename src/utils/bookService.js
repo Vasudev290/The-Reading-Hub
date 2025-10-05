@@ -20,7 +20,7 @@ class BookService {
         category: "Classic",
         price: 299,
         stock: 5,
-        imageUrl: "/images/to-kill-a-mockingbird.jpg",
+        imageUrl: "/images/to-kill-a-mockingbird.webp",
         description:
           "A novel about racial injustice in the Deep South, through the eyes of young Scout Finch.",
       },
