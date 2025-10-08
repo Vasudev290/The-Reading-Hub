@@ -1,98 +1,96 @@
-
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../../slices/authSlice';
+import AuthLayout from './AuthLayout';
 import { motion } from 'framer-motion';
-import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
+import useToast from '../../hooks/useToast';
 
-const LoginForm = ({ onSwitchToRegister }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  
-  const { login } = useAuth();
-  const { t } = useLanguage();
+const LoginForm = () => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { users } = useSelector((state) => state.auth);
+  const toast = useToast();
 
-  const handleSubmit = async (e) => {
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    
+    const user = users.find(
+      (u) => u.email === formData.email && u.password === formData.password
+    );
 
-    const result = login(email, password);
-    
-    if (!result.success) {
-      setError(result.error);
+    if (user) {
+      dispatch(login(user));
+      toast.success(`Welcome back, ${user.name}!`);
+      navigate(user.role === 'admin' ? '/admin' : '/');
+    } else {
+      toast.error('Invalid email or password');
     }
-    
-    setLoading(false);
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      className="w-full max-w-md"
-    >
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"
-          >
-            {error}
-          </motion.div>
-        )}
-        
+    <AuthLayout title="Sign in to your account">
+      <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {t('emailAddress')}
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Email address
           </label>
           <input
             id="email"
+            name="email"
             type="email"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            placeholder={t('emailAddress')}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+            value={formData.email}
+            onChange={handleChange}
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {t('password')}
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Password
           </label>
           <input
             id="password"
+            name="password"
             type="password"
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            placeholder={t('password')}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+            value={formData.password}
+            onChange={handleChange}
           />
         </div>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition-colors disabled:opacity-50"
+          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          {loading ? t('signingIn') : t('signIn')}
-        </button>
+          Sign in
+        </motion.button>
 
         <div className="text-center">
-          <button
-            type="button"
-            onClick={onSwitchToRegister}
-            className="text-blue-600 hover:text-blue-500 dark:text-blue-400 text-sm"
+          <Link
+            to="/register"
+            className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
           >
-            {t('createNewAccount')}
-          </button>
+            Don't have an account? Sign up
+          </Link>
         </div>
       </form>
-    </motion.div>
+    </AuthLayout>
   );
 };
 

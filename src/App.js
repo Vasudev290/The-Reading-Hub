@@ -1,44 +1,74 @@
-
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { ThemeProvider } from './context/ThemeContext';
-import { LanguageProvider } from './context/LanguageContext';
-import { ToastProvider } from './context/ToastContext'; // Add this
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 import Navbar from './components/common/Navbar';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import Toast from './components/common/Toast';
 import Home from './pages/Home';
+import LoginForm from './components/auth/LoginForm';
+import RegisterForm from './components/auth/RegisterForm';
 import BookDetails from './pages/BookDetails';
 import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
-import ProtectedRoute from './components/common/ProtectedRoute';
+import { useSelector } from 'react-redux';
 
-function App() {
+const AppContent = () => {
+  const { theme } = useSelector((state) => state.ui);
+
   return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <ToastProvider> 
-            <Router>
-              <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
-                <Navbar />
-                <main className="container mx-auto px-4 py-8">
-                  <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-                    <Route path="/book/:id" element={<ProtectedRoute><BookDetails /></ProtectedRoute>} />
-                    <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                    <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
-                </main>
-              </div>
-            </Router>
-          </ToastProvider>
-        </AuthProvider>
-      </LanguageProvider>
-    </ThemeProvider>
+    <div className={theme}>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        <Router>
+          <Navbar />
+          <Toast/>
+          <Routes>
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/register" element={<RegisterForm />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/book/:id"
+              element={
+                <ProtectedRoute>
+                  <BookDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Router>
+      </div>
+    </div>
+  );
+}
+
+const App = () => {
+  return (
+    <Provider store={store}>
+      <AppContent />
+    </Provider>
   );
 }
 

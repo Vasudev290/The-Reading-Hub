@@ -1,58 +1,61 @@
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { borrowBook, toggleWishlist } from '../../slices/authSlice';
+import { borrowBookAction } from '../../slices/bookSlice';
 import { motion } from 'framer-motion';
-import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
-import { useToast } from '../../context/ToastContext';
-import { bookService } from '../../utils/bookService';
-import { userService } from '../../utils/userService';
+import useToast from '../../hooks/useToast';
 
-const BookCard = ({ book, onUpdate }) => {
-  const { user } = useAuth();
-  const { t } = useLanguage();
-  const { addToast } = useToast();
+const BookCard = ({ book }) => {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  
+  // Safe check for wishlist and borrowedBooks
+  const isInWishlist = user?.wishlist?.includes?.(book.id) || false;
+  const isBorrowed = user?.borrowedBooks?.some?.(b => b.id === book.id && !b.returned) || false;
+  
+  const toast = useToast();
 
-  const handleBorrow = async () => {
+  const handleBorrow = () => {
     if (!user) {
-      addToast('Please login to borrow books', 'error');
+      toast.error('Please login to borrow books');
       return;
     }
 
-    const result = bookService.borrowBook(book.id, user.id);
-    if (result.success) {
-      addToast(`${t('bookBorrowedSuccess')}: ${book.title}`, 'success');
-      onUpdate?.();
+    if (user.role !== 'user') {
+      toast.error('Only regular users can borrow books');
+      return;
+    }
+
+    if (book.stock > 0 && !isBorrowed) {
+      dispatch(borrowBookAction(book.id));
+      dispatch(borrowBook(book));
+      toast.success(`Successfully borrowed "${book.title}"`);
+    } else if (isBorrowed) {
+      toast.info('You have already borrowed this book');
     } else {
-      addToast(result.error, 'error');
+      toast.error('This book is out of stock');
     }
   };
 
   const handleWishlist = () => {
     if (!user) {
-      addToast('Please login to add to wishlist', 'error');
+      toast.error('Please login to manage wishlist');
       return;
     }
 
+    if (user.role !== 'user') {
+      toast.info('Wishlist is only available for regular users');
+      return;
+    }
+
+    dispatch(toggleWishlist(book.id));
     if (isInWishlist) {
-      // Remove from wishlist
-      const result = userService.removeFromWishlist(user.id, book.id);
-      if (result.success) {
-        addToast(`Removed from wishlist: ${book.title}`, 'info');
-        onUpdate?.();
-      }
+      toast.info(`Removed "${book.title}" from wishlist`);
     } else {
-      // Add to wishlist
-      const result = userService.addToWishlist(user.id, book.id);
-      if (result.success) {
-        addToast(`Added to wishlist: ${book.title}`, 'success');
-        onUpdate?.();
-      } else {
-        addToast(result.message, 'error');
-      }
+      toast.success(`Added "${book.title}" to wishlist`);
     }
   };
-
-  const isInWishlist = user?.wishlist?.includes(book.id);
-  const isBorrowed = user?.borrowedBooks?.some(b => b.bookId === book.id);
 
   return (
     <motion.div
@@ -60,73 +63,80 @@ const BookCard = ({ book, onUpdate }) => {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      whileHover={{ y: -2, scale: 1.02 }}
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-all hover:shadow-xl"
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
     >
-      <Link to={`/book/${book.id}`}>
-        <img
-          src={book.image}
-          alt={book.title}
-          className="w-full h-32 sm:h-36 md:h-40 lg:h-48 object-contain hover:opacity-90 transition-opacity p-2"
-        />
-      </Link>
+      <img
+        src={book.image}
+        alt={book.title}
+        className="w-full h-48 object-cover"
+      />
       
-      <div className="p-3 sm:p-4">
+      <div className="p-4">
         <Link to={`/book/${book.id}`}>
-          <h3 className="font-semibold text-sm sm:text-base lg:text-lg text-gray-800 dark:text-white hover:text-blue-500 transition-colors line-clamp-2 min-h-[2.5rem]">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">
             {book.title}
           </h3>
         </Link>
         
-        <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mt-1 line-clamp-1">
-          {t('by')} {book.author}
+        <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">
+          by {book.author}
         </p>
         
-        <div className="flex items-center justify-between mt-2 sm:mt-3">
-          <span className="text-yellow-500 font-semibold text-xs sm:text-sm">
-            ⭐ {book.rating?.toFixed(1) || '0.0'}
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+            {book.category}
           </span>
-          <span className="text-green-600 dark:text-green-400 font-bold text-xs sm:text-sm">
+          <div className="flex items-center">
+            <span className="text-yellow-500">⭐</span>
+            <span className="text-sm text-gray-600 dark:text-gray-300 ml-1">
+              {book.rating?.toFixed(1) || 'No ratings'}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
             ${book.price}
           </span>
-        </div>
-        
-        <div className="flex items-center justify-between mt-2 sm:mt-3">
-          <span className={`text-xs ${book.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {book.stock > 0 ? `${book.stock} ${t('available')}` : t('outOfStock')}
-          </span>
-          <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded truncate max-w-[100px]">
-            {book.category}
+          <span className={`text-sm font-medium ${
+            book.stock > 0 ? 'text-green-600' : 'text-red-600'
+          }`}>
+            {book.stock > 0 ? `${book.stock} available` : 'Out of Stock'}
           </span>
         </div>
 
-        {user?.role === 'user' && (
-          <div className="flex space-x-2 mt-3 sm:mt-4">
+        <div className="flex space-x-2">
+          {user?.role === 'user' && (
             <button
               onClick={handleBorrow}
               disabled={book.stock === 0 || isBorrowed}
-              className={`flex-1 py-1.5 sm:py-2 px-2 sm:px-3 rounded-md text-xs sm:text-sm font-medium transition-colors ${
+              className={`flex-1 py-2 px-3 rounded text-sm font-medium ${
                 book.stock === 0 || isBorrowed
                   ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
               }`}
             >
-              {isBorrowed ? t('borrowed') : t('borrow')}
+              {isBorrowed ? 'Borrowed' : 'Borrow'}
             </button>
-            
+          )}
+          
+          {user && (
             <button
               onClick={handleWishlist}
-              className={`p-1.5 sm:p-2 rounded-md transition-colors text-xs sm:text-base ${
-                isInWishlist
-                  ? 'bg-yellow-500 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 hover:bg-yellow-500 hover:text-white'
+              className={`p-2 rounded ${
+                user.role === 'user' 
+                  ? (isInWishlist
+                      ? 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400'
+                      : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300')
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed'
               }`}
-              title={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+              disabled={user.role !== 'user'}
+              title={user.role !== 'user' ? 'Wishlist available only for regular users' : ''}
             >
-              {isInWishlist ? '❤️' : '♡'}
+              {user.role === 'user' ? (isInWishlist ? '❤️' : '🤍') : '📋'}
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </motion.div>
   );
