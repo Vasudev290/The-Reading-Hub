@@ -1,13 +1,15 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const getInitialTheme = () => {
-  const savedTheme = localStorage.getItem('theme');
+  const savedTheme = localStorage.getItem("theme");
   if (savedTheme) return savedTheme;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 };
 
 const getInitialLanguage = () => {
-  return localStorage.getItem('language') || 'en';
+  return localStorage.getItem("language") || "en";
 };
 
 const initialState = {
@@ -17,16 +19,16 @@ const initialState = {
 };
 
 const uiSlice = createSlice({
-  name: 'ui',
+  name: "ui",
   initialState,
   reducers: {
     toggleTheme: (state) => {
-      state.theme = state.theme === 'light' ? 'dark' : 'light';
-      localStorage.setItem('theme', state.theme);
+      state.theme = state.theme === "light" ? "dark" : "light";
+      localStorage.setItem("theme", state.theme);
     },
     setLanguage: (state, action) => {
       state.language = action.payload;
-      localStorage.setItem('language', action.payload);
+      localStorage.setItem("language", action.payload);
     },
     setLoading: (state, action) => {
       state.isLoading = action.payload;

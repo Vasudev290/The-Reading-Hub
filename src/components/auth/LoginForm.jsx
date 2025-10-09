@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../../slices/authSlice';
-import AuthLayout from './AuthLayout';
-import { motion } from 'framer-motion';
-import useToast from '../../hooks/useToast';
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../../slices/authSlice";
+import AuthLayout from "./AuthLayout";
+import { motion } from "framer-motion";
+import useToast from "../../hooks/useToast";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const LoginForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     const user = users.find(
       (u) => u.email === formData.email && u.password === formData.password
     );
@@ -33,9 +33,9 @@ const LoginForm = () => {
     if (user) {
       dispatch(login(user));
       toast.success(`Welcome back, ${user.name}!`);
-      navigate(user.role === 'admin' ? '/admin' : '/');
+      navigate(user.role === "admin" ? "/admin" : "/");
     } else {
-      toast.error('Invalid email or password');
+      toast.error("Invalid email or password");
     }
   };
 
@@ -43,7 +43,10 @@ const LoginForm = () => {
     <AuthLayout title="Sign in to your account">
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Email address
           </label>
           <input
@@ -58,7 +61,10 @@ const LoginForm = () => {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Password
           </label>
           <input

@@ -1,25 +1,27 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   toasts: [],
 };
 
 const toastSlice = createSlice({
-  name: 'toast',
+  name: "toast",
   initialState,
   reducers: {
     addToast: (state, action) => {
       const toast = {
         id: Date.now().toString(),
-        type: 'info',
-        message: '',
+        type: "info",
+        message: "",
         duration: 4000,
         ...action.payload,
       };
       state.toasts.push(toast);
     },
     removeToast: (state, action) => {
-      state.toasts = state.toasts.filter(toast => toast.id !== action.payload);
+      state.toasts = state.toasts.filter(
+        (toast) => toast.id !== action.payload
+      );
     },
     clearToasts: (state) => {
       state.toasts = [];

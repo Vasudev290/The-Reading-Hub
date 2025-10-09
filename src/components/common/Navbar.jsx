@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../slices/authSlice";
@@ -36,8 +36,8 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo Section */}
           <div className="flex items-center">
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="flex-shrink-0 flex items-center"
               onClick={handleNavLinkClick}
             >
@@ -114,7 +114,7 @@ const Navbar = () => {
             >
               {theme === "light" ? "🌙" : "☀️"}
             </button>
-            
+
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
@@ -125,7 +125,9 @@ const Navbar = () => {
               <div className="w-6 h-6 flex flex-col justify-center items-center">
                 <span
                   className={`block w-5 h-0.5 bg-current transform transition duration-300 ease-in-out ${
-                    isMobileMenuOpen ? "rotate-45 translate-y-0.5" : "-translate-y-1"
+                    isMobileMenuOpen
+                      ? "rotate-45 translate-y-0.5"
+                      : "-translate-y-1"
                   }`}
                 />
                 <span
@@ -135,7 +137,9 @@ const Navbar = () => {
                 />
                 <span
                   className={`block w-5 h-0.5 bg-current transform transition duration-300 ease-in-out ${
-                    isMobileMenuOpen ? "-rotate-45 -translate-y-0.5" : "translate-y-1"
+                    isMobileMenuOpen
+                      ? "-rotate-45 -translate-y-0.5"
+                      : "translate-y-1"
                   }`}
                 />
               </div>
@@ -178,7 +182,7 @@ const Navbar = () => {
                     >
                       Logout
                     </button>
-                    
+
                     {/* User info in mobile menu */}
                     <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700 mt-2 pt-3">
                       <p className="text-sm text-gray-500 dark:text-gray-400">

@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
-import { register, login } from '../../slices/authSlice';
-import AuthLayout from './AuthLayout';
-import { motion } from 'framer-motion';
-import useToast from '../../hooks/useToast';
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { register, login } from "../../slices/authSlice";
+import AuthLayout from "./AuthLayout";
+import { motion } from "framer-motion";
+import useToast from "../../hooks/useToast";
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'user',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: "user",
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const RegisterForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords don't match");
       return;
@@ -35,16 +35,26 @@ const RegisterForm = () => {
 
     const { confirmPassword, ...userData } = formData;
     dispatch(register(userData));
-    dispatch(login({ ...userData, id: Date.now().toString(), borrowedBooks: [], wishlist: [] }));
+    dispatch(
+      login({
+        ...userData,
+        id: Date.now().toString(),
+        borrowedBooks: [],
+        wishlist: [],
+      })
+    );
     toast.success(`Account created successfully! Welcome, ${userData.name}`);
-    navigate(userData.role === 'admin' ? '/admin' : '/');
+    navigate(userData.role === "admin" ? "/admin" : "/");
   };
 
   return (
     <AuthLayout title="Create your account">
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Full Name
           </label>
           <input
@@ -59,7 +69,10 @@ const RegisterForm = () => {
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Email address
           </label>
           <input
@@ -74,7 +87,10 @@ const RegisterForm = () => {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Password
           </label>
           <input
@@ -89,7 +105,10 @@ const RegisterForm = () => {
         </div>
 
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="confirmPassword"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Confirm Password
           </label>
           <input
@@ -104,7 +123,10 @@ const RegisterForm = () => {
         </div>
 
         <div>
-          <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="role"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Role
           </label>
           <select
